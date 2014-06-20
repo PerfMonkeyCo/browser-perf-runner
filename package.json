@@ -2,9 +2,8 @@
   "name": "browser-perf-runner",
   "version": "0.0.0",
   "description": "Run browser-perf on websites by submitting a pull request",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node index.js"
   },
   "repository": {
     "type": "git",
