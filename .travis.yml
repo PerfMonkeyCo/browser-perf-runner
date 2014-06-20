@@ -1,0 +1,11 @@
+--- 
+install: 
+- npm install > /dev/null
+language: node_js
+node_js: 
+- "0.10"
+notifications: 
+  email: false
+branches:
+  only:
+    - master

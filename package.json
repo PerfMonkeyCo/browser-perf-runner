@@ -1,0 +1,27 @@
+{
+  "name": "browser-perf-runner",
+  "version": "0.0.0",
+  "description": "Run browser-perf on websites by submitting a pull request",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/PerfMonkeyCo/browser-perf-runner.git"
+  },
+  "keywords": [
+    "browser-perf",
+    "performance"
+  ],
+  "author": "Parashuram <code@r.nparashuram.com>",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/PerfMonkeyCo/browser-perf-runner/issues"
+  },
+  "homepage": "https://github.com/PerfMonkeyCo/browser-perf-runner",
+  "dependencies": {
+    "browser-perf": "^0.1.13",
+    "cli-table": "^0.3.0"
+  }
+}
