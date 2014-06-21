@@ -1,5 +1,6 @@
 var browserPerf = require('browser-perf'),
-	fs = require('fs');
+	fs = require('fs'),
+	asciify = require('asciify');
 
 var log = {
 	'fatal': console.error.bind(console),
@@ -44,23 +45,42 @@ try {
 	console.log(e);
 }
 
-browserPerf(data.website, function(err, data) {
-	if (err) {
-		log.error(err);
-	} else {
-		log.info(generateTable(data));
-	}
-}, {
-	browsers: [{
-		browserName: 'chrome',
-		version: 35,
-		name: data.name || 'perfmonkey.com',
-		build : data.website,
-		tags: ["perfmonkey.com"]
-	}],
-	//selenium: "http://localhost:4444/wd/hub",
-	selenium: "ondemand.saucelabs.com",
-	username: data.sauce_username || 'perfmonkey-test',
-	accesskey: data.sauce_accesskey || '32b71b26-f0b6-49f1-bb03-db401782c783',
-	logger: log
+var results_explain = '\n\nTo interpret these results and for more information on how to run these tests for your site, visit http://perfmonkey.com/#/trynow/results/travis/' + (process.env.TRAVIS_BUILD_ID || '') + '\n\n';
+
+asciify('Starting tests : ', {
+	font: 'small'
+}, function(err, res) {
+	log.info(res);
+	log.info('Scroll to the bottom to see the results');
+	log.info(results_explain);
+	log.info('========================================\n\n');
+	browserPerf(data.website, function(err, data) {
+		if (err) {
+			log.error(err);
+		} else {
+			log.info('--results:start--');
+			log.info(JSON.stringify(data));
+			log.info('--results:end--');
+			asciify('Perf Results : ', {
+				font: 'small'
+			}, function(err, res) {
+				log.info(res);
+				log.info(generateTable(data));
+				log.info(results_explain);
+			});
+		}
+	}, {
+		browsers: [{
+			browserName: 'chrome',
+			version: 35,
+			name: data.name || 'perfmonkey.com',
+			build: data.website,
+			tags: ["perfmonkey.com"]
+		}],
+		//selenium: "http://localhost:4444/wd/hub",
+		selenium: "ondemand.saucelabs.com",
+		username: data.sauce_username || 'perfmonkey-test',
+		accesskey: data.sauce_accesskey || '32b71b26-f0b6-49f1-bb03-db401782c783',
+		logger: log
+	});
 });

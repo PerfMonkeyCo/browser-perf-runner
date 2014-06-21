@@ -1,6 +1,6 @@
 --- 
 install: 
-- npm install > /dev/null
+- npm install
 language: node_js
 node_js: 
 - "0.10"
