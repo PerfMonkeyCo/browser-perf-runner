@@ -40,7 +40,7 @@ var generateTable = function(data) {
 };
 
 try {
-	var data = JSON.parse(fs.readFileSync('./config.json'));
+	var config = JSON.parse(fs.readFileSync('./config.json'));
 } catch (e) {
 	console.log(e);
 }
@@ -54,10 +54,11 @@ asciify('Starting tests : ', {
 	log.info('Scroll to the bottom to see the results');
 	log.info(results_explain);
 	log.info('========================================\n\n');
-	browserPerf(data.website, function(err, data) {
+	browserPerf(config.website, function(err, data) {
 		if (err) {
 			log.error(err);
 		} else {
+			data._url = config.website;
 			log.info('--results:start--');
 			log.info(JSON.stringify(data));
 			log.info('--results:end--');
@@ -73,14 +74,14 @@ asciify('Starting tests : ', {
 		browsers: [{
 			browserName: 'chrome',
 			version: 35,
-			name: data.name || 'perfmonkey.com',
-			build: data.website,
+			name: config.name || 'perfmonkey.com',
+			build: config.website,
 			tags: ["perfmonkey.com"]
 		}],
 		//selenium: "http://localhost:4444/wd/hub",
 		selenium: "ondemand.saucelabs.com",
-		username: data.sauce_username || 'perfmonkey-test',
-		accesskey: data.sauce_accesskey || '32b71b26-f0b6-49f1-bb03-db401782c783',
+		username: config.sauce_username || 'perfmonkey-test',
+		accesskey: config.sauce_accesskey || '32b71b26-f0b6-49f1-bb03-db401782c783',
 		logger: log
 	});
 });
