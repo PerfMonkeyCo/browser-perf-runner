@@ -1,6 +1,4 @@
 --- 
-install: 
-- npm install
 language: node_js
 node_js: 
 - "0.10"
@@ -9,3 +7,5 @@ notifications:
 branches:
   only:
     - master
+install: 
+- npm install

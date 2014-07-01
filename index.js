@@ -1,16 +1,18 @@
 var browserPerf = require('browser-perf'),
 	fs = require('fs'),
-	asciify = require('asciify');
+	asciify = require('asciify'),
+	SauceTunnel = require('sauce-tunnel');
 
-var log = {
-	'fatal': console.error.bind(console),
-	'error': console.error.bind(console),
-	'warn': console.warn.bind(console),
-	'info': console.info.bind(console),
-	'debug': console.log.bind(console),
-	'trace': console.trace.bind(console),
-};
+try {
+	var config = JSON.parse(fs.readFileSync('./config.json'));
+} catch (e) {
+	console.log(e);
+}
 
+var SAUCE_USERNAME = 'perfmonkey-test',
+	SAUCE_ACCESS_KEY = '32b71b26-f0b6-49f1-bb03-db401782c783';
+
+var results_explain = '\n\nTo interpret these results and for more information on how to run these tests for your site, visit http://perfmonkey.com/#/trynow/results/travis/' + (process.env.TRAVIS_BUILD_ID || '') + '\n\n';
 var generateTable = function(data) {
 	var cliTable = require('cli-table'),
 		res = [];
@@ -39,49 +41,44 @@ var generateTable = function(data) {
 	return res.join('');
 };
 
-try {
-	var config = JSON.parse(fs.readFileSync('./config.json'));
-} catch (e) {
-	console.log(e);
-}
-
-var results_explain = '\n\nTo interpret these results and for more information on how to run these tests for your site, visit http://perfmonkey.com/#/trynow/results/travis/' + (process.env.TRAVIS_BUILD_ID || '') + '\n\n';
-
-asciify('Starting tests : ', {
-	font: 'small'
-}, function(err, res) {
-	log.info(res);
-	log.info('Scroll to the bottom to see the results');
-	log.info(results_explain);
-	log.info('========================================\n\n');
+var tunnelId = process.env.TRAVIS_BUILD_ID;
+var tunnel = new SauceTunnel(SAUCE_USERNAME, SAUCE_ACCESS_KEY, tunnelId, true);
+tunnel.start(function() {
+	console.log('Tunnel ready');
 	browserPerf(config.website, function(err, data) {
-		if (err) {
-			log.error(err);
-		} else {
-			data._url = config.website;
-			log.info('--results:start--');
-			log.info(JSON.stringify(data));
-			log.info('--results:end--');
-			asciify('Perf Results : ', {
-				font: 'small'
-			}, function(err, res) {
-				log.info(res);
-				log.info(generateTable(data));
-				log.info(results_explain);
-			});
-		}
+		tunnel.stop(function() {
+			console.log('Tunnel Shutdown');
+			if (err) {
+				console.log(err);
+			} else {
+				data[0]._url = config.website;
+				console.log('--results:start--');
+				console.log(JSON.stringify(data));
+				console.log('--results:end--');
+				asciify('Perf Results : ', {
+					font: 'small'
+				}, function(err, res) {
+					console.log(res);
+					console.log(generateTable(data));
+					console.log(results_explain);
+				});
+			}
+		});
 	}, {
 		browsers: [{
 			browserName: 'chrome',
 			version: 35,
-			name: config.name || 'perfmonkey.com',
+			name: 'perfmonkey.com',
 			build: config.website,
-			tags: ["perfmonkey.com"]
+			tags: ["perfmonkey.com"],
+			'tunnel-identifier': tunnelId
 		}],
-		//selenium: "http://localhost:4444/wd/hub",
-		selenium: "ondemand.saucelabs.com",
-		username: config.sauce_username || 'perfmonkey-test',
-		accesskey: config.sauce_accesskey || '32b71b26-f0b6-49f1-bb03-db401782c783',
-		logger: log
+		selenium: {
+			hostname: '127.0.0.1',
+			port: 4445,
+			user: SAUCE_USERNAME,
+			pwd: SAUCE_ACCESS_KEY
+		},
+		logger: console.log
 	});
 });
