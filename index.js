@@ -9,8 +9,13 @@ try {
 	console.log(e);
 }
 
-var SAUCE_USERNAME = 'perfmonkey-test',
-	SAUCE_ACCESS_KEY = '32b71b26-f0b6-49f1-bb03-db401782c783';
+var website = config.website,
+	sauce_username = config.sauce_username || process.env.SAUCE_USERNAME || 'perfmonkey-test',
+	sauce_access_key = config.sauce_access_key || process.env.SAUCE_ACCESS_KEY || '32b71b26-f0b6-49f1-bb03-db401782c783';
+
+if (!(website && sauce_username && sauce_access_key)) {
+	throw 'Need to specify website, username and accesskey';
+}
 
 var results_explain = '\n\nTo interpret these results and for more information on how to run these tests for your site, visit http://perfmonkey.com/#/trynow/results/travis/' + (process.env.TRAVIS_BUILD_ID || '') + '\n\n';
 var generateTable = function(data) {
@@ -41,17 +46,18 @@ var generateTable = function(data) {
 	return res.join('');
 };
 
+
 var tunnelId = process.env.TRAVIS_BUILD_ID;
-var tunnel = new SauceTunnel(SAUCE_USERNAME, SAUCE_ACCESS_KEY, tunnelId, true);
+var tunnel = new SauceTunnel(sauce_username, sauce_access_key, tunnelId, true);
 tunnel.start(function() {
 	console.log('Tunnel ready');
-	browserPerf(config.website, function(err, data) {
+	browserPerf(website, function(err, data) {
 		tunnel.stop(function() {
 			console.log('Tunnel Shutdown');
 			if (err) {
 				console.log(err);
 			} else {
-				data[0]._url = config.website;
+				data[0]._url = website;
 				console.log('--results:start--');
 				console.log(JSON.stringify(data));
 				console.log('--results:end--');
@@ -69,15 +75,15 @@ tunnel.start(function() {
 			browserName: 'chrome',
 			version: 35,
 			name: 'perfmonkey.com',
-			build: config.website,
+			build: website,
 			tags: ["perfmonkey.com"],
 			'tunnel-identifier': tunnelId
 		}],
 		selenium: {
 			hostname: '127.0.0.1',
 			port: 4445,
-			user: SAUCE_USERNAME,
-			pwd: SAUCE_ACCESS_KEY
+			user: sauce_username,
+			pwd: sauce_access_key
 		},
 		logger: console.log
 	});
