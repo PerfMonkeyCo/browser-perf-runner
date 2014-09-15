@@ -77,7 +77,12 @@ tunnel.start(function() {
 			name: 'perfmonkey.com',
 			build: website,
 			tags: ["perfmonkey.com"],
-			'tunnel-identifier': tunnelId
+			'tunnel-identifier': tunnelId,
+			'record-video': false,
+			'record-screenshots': false,
+			'record-logs': false,
+			'sauce-advisor': false,
+			'screen-resolution': '1280x1024'
 		}],
 		selenium: {
 			hostname: '127.0.0.1',
