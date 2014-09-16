@@ -81,8 +81,7 @@ tunnel.start(function() {
 			'record-video': false,
 			'record-screenshots': false,
 			'record-logs': false,
-			'sauce-advisor': false,
-			'screen-resolution': '1280x1024'
+			'sauce-advisor': false
 		}],
 		selenium: {
 			hostname: '127.0.0.1',
